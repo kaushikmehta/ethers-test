@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Document</title>
+
+<!-- <link rel="stylesheet" type="text/css" href="main.css"> -->
+
+<script src="./node_modules/ethers/dist/ethers.min.js"></script>
+
+
+</head>
+<body>
+<div class="container">
+
+<h1> Message and Author</h1>
+
+<h2 id="value"></h2>
+
+<label for="sondata" class="col-lg-2 control-label">paste your json</label>
+<input id="sondata" type="text">
+
+
+
+<label for="pw" class="col-lg-2 control-label">Enter your PW</label>
+<input id="pw" type="password">
+
+
+<br><br><br><br>
+
+<button id="call">Process details and get value</button>
+
+<br><br><br><br>
+
+<label for="name" class="col-lg-2 control-label">Enter a value</label>
+<input id="name" type="text">
+
+<button id="button">Set Value to Contract</button>
+
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+<script>
+
+	var ethers = require('ethers');
+	var providers = require('providers');
+// to call a non-constant function, the contract needs to be
+// initialized with a wallet or a customSigner
+// var ethers = require('ethers');
+var abi = [
+{
+"constant": false,
+"inputs": [
+{
+"name": "value",
+"type": "string"
+}
+],
+"name": "setValue",
+"outputs": [],
+"payable": false,
+"stateMutability": "nonpayable",
+"type": "function"
+},
+{
+"anonymous": false,
+"inputs": [
+{
+"indexed": false,
+"name": "author",
+"type": "address"
+},
+{
+"indexed": false,
+"name": "oldValue",
+"type": "string"
+},
+{
+"indexed": false,
+"name": "newValue",
+"type": "string"
+}
+],
+"name": "valueChanged",
+"type": "event"
+},
+{
+"constant": true,
+"inputs": [],
+"name": "getAuthorAndValue",
+"outputs": [
+{
+"name": "author",
+"type": "address"
+},
+{
+"name": "value",
+"type": "string"
+}
+],
+"payable": false,
+"stateMutability": "view",
+"type": "function"
+},
+{
+"constant": true,
+"inputs": [],
+"name": "getValue",
+"outputs": [
+{
+"name": "value",
+"type": "string"
+}
+],
+"payable": false,
+"stateMutability": "view",
+"type": "function"
+}
+];
+
+// FOR THE CALL FUNCTION - TRIGGERING CALL ON LOAD TO AVOID ERROR
+$("#call").click(function() {
+
+var address = '0x482ebde51308b43572482b03b6a428535c2cd646';
+
+var provider = ethers.providers.getDefaultProvider('ropsten');
+
+// var privateKey = '0x763227fd83077baed56da3fdf7ea1de98b1d5ed62c8e67371117d185b5d41124'; // actual pvt key -
+//var privateKey = '0x060df81be0c862ed5644a2cce0f4c1a6a490be3ba45a3642140ff2b758cfb614';
+
+var contract = new ethers.Contract(address, abi, provider);
+
+
+
+var callPromise = contract.getValue();
+
+// Previous code removed for brevity
+
+callPromise.then(function(value) {
+if(!error)
+{
+    $("#call").html('Single Return Value:' + value);
+    console.log(value);
+}
+else
+console.error(error);
+});
+
+});
+
+
+$("#button").click(function() {
+
+var address = '0x482ebde51308b43572482b03b6a428535c2cd646';
+
+var provider = ethers.providers.getDefaultProvider('ropsten');
+
+// var privateKey = '0x763227fd83077baed56da3fdf7ea1de98b1d5ed62c8e67371117d185b5d41124'; // actual pvt key -
+//var privateKey = '0x060df81be0c862ed5644a2cce0f4c1a6a490be3ba45a3642140ff2b758cfb614';
+
+var json = $("#sondata").val();
+var pw = $("#pw").val()
+
+var wallet = new ethers.Wallet.fromEncryptedWallet(json, pw);
+
+var contract = new ethers.Contract(address, abi, wallet);
+
+var sendPromise = contract.setValue($("#name").val(), overrideOptions);
+sendPromise.then(function(transaction) {
+console.log(transaction);
+});
+});
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
